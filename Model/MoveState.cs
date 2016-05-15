@@ -1,4 +1,4 @@
-﻿namespace MyTicTacToe
+﻿namespace Model
 {
     public enum MoveState
     {

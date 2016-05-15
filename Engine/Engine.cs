@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Model;
 
-namespace MyTicTacToe
+namespace MyEngine
 {
     public class Engine
     {
@@ -20,6 +21,8 @@ namespace MyTicTacToe
                     return new TicTacToeMove(board, state: state);
             }
         }
+
+        #region Determine board state
 
         public MoveState GetMoveState(char[,] board, char player, char aiPlayer)
         {
@@ -40,7 +43,7 @@ namespace MyTicTacToe
             return MoveState.Playing;
         }
 
-        public IEnumerable<char> GetWinnerForLine(char[,] board)
+        private IEnumerable<char> GetWinnerForLine(char[,] board)
         {
             int order = GetOrder(board);
 
@@ -61,7 +64,7 @@ namespace MyTicTacToe
             yield return FindWinner(board, order, order-1, 0, -1, 1);
         }
 
-        public static char FindWinner(char[,] board, int order, int startRow, int startCol, int dr, int dc)
+        private static char FindWinner(char[,] board, int order, int startRow, int startCol, int dr, int dc)
         {
             char firstField = board[startRow, startCol];
             for (int i = 0; i < order; i++)
@@ -76,7 +79,7 @@ namespace MyTicTacToe
             return firstField;
         }
 
-        public static IEnumerable<char> Flatten(char[,] board)
+        private static IEnumerable<char> Flatten(char[,] board)
         {
             int order = GetOrder(board);
 
@@ -85,18 +88,36 @@ namespace MyTicTacToe
                     yield return board[i, j];
         }
 
-        Random rnd = new Random();
+        private static int GetOrder(char[,] board)
+        {
+            if (board == null) return 0;
+            return Math.Min(board.GetUpperBound(0), board.GetUpperBound(1)) + 1;
+        }
+
+        #endregion
+
+        private TicTacToeMove CreateMove(char[,] board, char player, char aiPlayer, int row, int col)
+        {
+            char[,] newBoard = (char[,])board.Clone();
+            newBoard[row, col] = aiPlayer;
+            MoveState state = GetMoveState(newBoard, player, aiPlayer);
+            return new TicTacToeMove(newBoard, moveRow: row, moveCol: col, state: state);
+        }
+
+        private readonly Random _rnd = new Random();
 
         private TicTacToeMove GetNextMove(char[,] board, char player, char aiPlayer)
         {
             int order = GetOrder(board);
 
+            int[,] minMaxBoard = new int[order, order];
+
             int row, col;
 
             for (;;)
             {
-                row = rnd.Next(order);
-                col = rnd.Next(order);
+                row = _rnd.Next(order);
+                col = _rnd.Next(order);
                 char cell = board[row, col];
 
                 if (cell == '\0')
@@ -104,19 +125,115 @@ namespace MyTicTacToe
             }
         }
 
-        private TicTacToeMove CreateMove(char[,] board, char player, char aiPlayer, int row, int col)
+        //private int GetMinimax(char[,] board, int order, char player, char aiPlayer)
+        //{
+        //    var moveState = GetMoveState(board, player, aiPlayer);
+        //    if (moveState == MoveState.AiWin) return 100;
+        //    if (moveState == MoveState.PlayerWin) return -100;
+
+        //    {
+        //        scoreboard = null;
+        //        return true;
+        //    }
+
+        //}
+
+        /*
+
+        private MoveState EvaluateBoard(char[,] board, int order, char player, char aiPlayer, out int[,] scoreboard)
         {
-            char[,] newBoard = (char[,])board.Clone();
-            newBoard[row, col] = aiPlayer;
-            MoveState state = GetMoveState(newBoard, player, aiPlayer);
-            return new TicTacToeMove(newBoard, row, col, state);
+            var moveState = GetMoveState(board, player, aiPlayer);
+            if (moveState == MoveState.PlayerWin || moveState == MoveState.AiWin)
+            {
+                scoreboard = null;
+                return true;
+            }
+
+            scoreboard = new int[order, order];
+
+            for (int i = 0; i < order; i++)
+            {
+                for (int j = 0; j < order; j++)
+                {
+                    char cell = board[i, j];
+                    if (cell != '\0') continue;
+
+
+
+
+
+                }
+
+            }
+            return false;
         }
 
-        public static int GetOrder(char[,] board)
+     */
+
+            /*
+        public static RowCol GetBestMove(char[,] gb, char p)
         {
-            if (board == null) return 0;
-            return Math.Min(board.GetUpperBound(0), board.GetUpperBound(1)) + 1;
+            RowCol? bestSpace = null;
+            List<RowCol> openSpaces = new List<RowCol>();
+
+            int order = GetOrder(gb);
+
+            for (int i = 0; i < order; i++)
+            {
+                for (int j = 0; j < order; j++)
+                {
+                    if (gb[i, j] == '\0')
+                        openSpaces.Add(new RowCol(i, j));
+                }
+            }
+
+            char[,] newBoard;
+
+            for (int i = 0; i < openSpaces.Count; i++)
+            {
+                newBoard = (char[,])gb.Clone();
+                RowCol newSpace = openSpaces[i];
+
+                newBoard[newSpace.Row, newSpace.Col] = p;
+
+                if (newBoard.Winner == Player.Open && newBoard.OpenSquares.Count > 0)
+                {
+                    RowCol tempMove = GetBestMove(newBoard, ((Player)(-(int)p)));  //a little hacky, inverts the current player
+                    newSpace.Rank = tempMove.Rank;
+                }
+                else
+                {
+                    if (newBoard.Winner == Player.Open)
+                        newSpace.Rank = 0;
+                    else if (newBoard.Winner == Player.X)
+                        newSpace.Rank = -1;
+                    else if (newBoard.Winner == Player.O)
+                        newSpace.Rank = 1;
+                }
+
+                //If the new move is better than our previous move, take it
+                if (bestSpace == null ||
+                   (p == Player.X && newSpace.Rank < ((Space)bestSpace).Rank) ||
+                   (p == Player.O && newSpace.Rank > ((Space)bestSpace).Rank))
+                {
+                    bestSpace = newSpace;
+                }
+            }
+
+            return (RowCol)bestSpace;
         }
 
+    */
+        struct RowCol
+        {
+            public RowCol(int row, int col)
+            {
+                Row = row;
+                Col = col;
+            }
+
+            public int Row;
+            public int Col;
+        }
     }
 }

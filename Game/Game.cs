@@ -1,11 +1,16 @@
-﻿namespace MyTicTacToe
+﻿using Model;
+using MyEngine;
+using MyTicTacToe;
+
+namespace Game
 {
     public class Game
     {
-        private Engine _engine;
-        private View _view;
-        char[,] _board = new char[3, 3];
-        char _player, _aiPlayer;
+        private readonly Engine _engine;
+        private readonly View _view;
+        private char[,] _board = new char[3, 3];
+        private char _player;
+        private char _aiPlayer;
 
         public Game(Engine engine, View view)
         {
@@ -33,11 +38,12 @@
 
             while (aiMove.State == MoveState.Playing)
             {
-                TicTacToeMove playerMove = _view.GetPlayerMove(_board);
-                _board[playerMove.MoveRow, playerMove.MoveCol] = _player;
+                TicTacToeMove playerMove = _view.GetPlayerMove(_board, _player);
+                _board = playerMove.Board;
 
                 aiMove = _engine.GetMove(_board, _player, _aiPlayer);
                 _board = aiMove.Board;
+
                 _view.ShowBoard(_board, _player, _aiPlayer, playerMove, aiMove);
             }
 

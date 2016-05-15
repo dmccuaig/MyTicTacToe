@@ -1,16 +1,17 @@
-﻿using MyTicTacToe;
-using System;
+﻿using System;
+using MyEngine;
+using MyTicTacToe;
 
-namespace App
+namespace ConsoleApp
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main()
         {
             Engine engine = new Engine();
-            View view = new ConsoleView();
+            View view = new ConsoleView.ConsoleView();
 
-            Game game = new Game(engine, view);
+            Game.Game game = new Game.Game(engine, view);
 
             game.Play();
 

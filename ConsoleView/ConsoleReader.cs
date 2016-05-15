@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace MyTicTacToe
+namespace ConsoleView
 {
     public class ConsoleReader
     {
-        private string _prompt;
-        private string _default;
-        private Regex _allowable;
+        private readonly string _prompt;
+        private readonly string _default;
+        private readonly Regex _allowable;
 
         public ConsoleReader(string prompt, string def = null, Regex allowable = null)
         {
@@ -30,7 +30,7 @@ namespace MyTicTacToe
 
         public string GetString()
         {
-            string answer = null;
+            string answer;
             do
             {
                 Console.Write(_prompt);

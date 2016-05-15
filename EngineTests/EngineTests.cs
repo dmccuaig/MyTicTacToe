@@ -1,23 +1,25 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Model;
+using MyEngine;
 
-namespace MyTicTacToe.Tests
+namespace EngineTests
 {
     [TestClass]
-    public partial class EngineTests
+    public class EngineTests
     {
         const char _ = '\0';
-        const char X = 'X';
-        const char O = 'O';
+        private const char X = 'X';
+        private const char O = 'O';
 
-        Engine _engine = new Engine();
-        char _player = 'X';
-        char _aiPlayer = 'O';
+        readonly Engine _engine = new Engine();
+        private const char _player = 'X';
+        private const char _aiPlayer = 'O';
 
         [TestMethod]
         public void IsAiWinTests()
         {
             char[,] b;
-            MoveState expectedState = MoveState.AiWin;
+            const MoveState expectedState = MoveState.AiWin;
 
             b = new char[,]
             {
