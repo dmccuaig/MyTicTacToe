@@ -1,9 +1,8 @@
 using System;
 using System.Text.RegularExpressions;
-using Model;
-using MyTicTacToe;
+using TicTacToe.Model;
 
-namespace ConsoleView
+namespace TicTacToe.ConsoleView
 {
     public class ConsoleView : View
     {

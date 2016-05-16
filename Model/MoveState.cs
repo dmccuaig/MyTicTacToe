@@ -1,4 +1,4 @@
-﻿namespace Model
+﻿namespace TicTacToe.Model
 {
     public enum MoveState
     {

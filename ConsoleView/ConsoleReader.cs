@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace ConsoleView
+namespace TicTacToe.ConsoleView
 {
     public class ConsoleReader
     {

@@ -1,17 +1,18 @@
 ﻿using System;
-using MyEngine;
-using MyTicTacToe;
+using TicTacToe.ConsoleView;
+using TicTacToe.Engine;
+using TicTacToe.Game;
 
-namespace ConsoleApp
+namespace TicTacToe.ConsoleApp
 {
     internal class Program
     {
         private static void Main()
         {
-            Engine engine = new Engine();
+            AiEngine engine = new AiEngine();
             View view = new ConsoleView.ConsoleView();
 
-            Game.Game game = new Game.Game(engine, view);
+            XOGame game = new XOGame(engine, view);
 
             game.Play();
 

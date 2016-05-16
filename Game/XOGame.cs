@@ -1,18 +1,17 @@
-﻿using Model;
-using MyEngine;
-using MyTicTacToe;
+﻿using TicTacToe.ConsoleView;
+using TicTacToe.Model;
 
-namespace Game
+namespace TicTacToe.Game
 {
-    public class Game
+    public class XOGame
     {
-        private readonly Engine _engine;
+        private readonly Engine.AiEngine _engine;
         private readonly View _view;
         private char[,] _board = new char[3, 3];
         private char _player;
         private char _aiPlayer;
 
-        public Game(Engine engine, View view)
+        public XOGame(Engine.AiEngine engine, View view)
         {
             _engine = engine;
             _view = view;

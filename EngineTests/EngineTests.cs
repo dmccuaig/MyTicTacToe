@@ -1,8 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Model;
-using MyEngine;
+using TicTacToe.Model;
 
-namespace EngineTests
+namespace TicTacToe.EngineTests
 {
     [TestClass]
     public class EngineTests
@@ -11,7 +10,7 @@ namespace EngineTests
         private const char X = 'X';
         private const char O = 'O';
 
-        readonly Engine _engine = new Engine();
+        readonly Engine.AiEngine _engine = new Engine.AiEngine();
         private const char _player = 'X';
         private const char _aiPlayer = 'O';
 
