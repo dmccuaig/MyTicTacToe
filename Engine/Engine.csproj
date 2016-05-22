@@ -34,9 +34,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AiEngine.cs" />
+    <Compile Include="AlphaBeta.cs" />
     <Compile Include="Engine.FindWinner.cs" />
     <Compile Include="Engine.Util.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TicTacToeNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ConsoleView\ConsoleView.csproj">

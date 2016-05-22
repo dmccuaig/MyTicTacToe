@@ -67,20 +67,7 @@ namespace TicTacToe.EngineTests
                 {O,X,X},
             };
 
-        [TestMethod]
-        public void EndGame1()
-        {
-            int score = _engine.GetScoreForMove5(b7, new Engine.AiEngine.Cell(0,2,O), X, 0);
-            Assert.AreEqual(score, 100);
-        }
-
-        [TestMethod]
-        public void EndGame2()
-        {
-            int score = _engine.GetScoreForMove5(b7, new Engine.AiEngine.Cell(1, 0, O), X, 0);
-            Assert.AreEqual(score, 1);
-
-        }
+      
 
     }
 }
