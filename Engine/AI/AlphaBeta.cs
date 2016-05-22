@@ -4,47 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TicTacToe.Engine
+namespace TicTacToe.Engine.AI
 {
-    public interface INode
-    {
-        int Player { get; }
-        int Opponent { get; }
-        INode[] Children { get; }
-        double Score { get; }
-        int Depth { get; set; }
-    }
-
-    struct ScoredNode : IComparable<ScoredNode>
-    {
-        public ScoredNode(INode node, double score)
-        {
-            Node = node;
-            Score = score;
-        }
-        public INode Node;
-        public double Score;
-
-        public int CompareTo(ScoredNode other)
-        {
-            return Score.CompareTo(other.Score);
-        }
-
-        public override string ToString()
-        {
-            return $"{Node}Score: {Score}";
-        }
-    }
-
     public static class AlphaBeta
     {
-        public const int None = 0;
-        public const int Maximize = 1;
-        public const int Minimize = 2;
 
         public static INode BestMove(INode node)
         {
-            bool maximizing = node.Player == Maximize;
+            bool maximizing = node.Player == Move.Player;
 
             var scoredNodes = GetScoredNodes(node, maximizing);
             //var scoredNodes = ParallelGetScoredNodes(node, maximizing);
@@ -62,7 +29,7 @@ namespace TicTacToe.Engine
                 scoredNodes.Add(
                     new ScoredNode(
                         child,
-                        Search(child, double.NegativeInfinity, double.PositiveInfinity, !maximizing)
+                        Score(child, double.NegativeInfinity, double.PositiveInfinity, !maximizing)
                     )
                 );
             }
@@ -77,7 +44,7 @@ namespace TicTacToe.Engine
             Action<INode> scoreChild = child => scoredNodes.Add(
                 new ScoredNode(
                     child,
-                    Search(child, double.NegativeInfinity, double.PositiveInfinity, !maximizing)
+                    Score(child, double.NegativeInfinity, double.PositiveInfinity, !maximizing)
                 )
             );
 
@@ -86,7 +53,31 @@ namespace TicTacToe.Engine
             return scoredNodes;
         }
 
-        private static double Search(INode node, double alpha, double beta, bool maximize)
+        /*
+01 function alphabeta(node, depth, α, β, maximizingPlayer)
+02      if depth = 0 or node is a terminal node
+03          return the heuristic value of node
+04      if maximizingPlayer
+05          v := -∞
+06          for each child of node
+07              v := max(v, alphabeta(child, depth - 1, α, β, FALSE))
+08              α := max(α, v)
+09              if β ≤ α
+10                  break (* β cut-off *)
+11          return v
+12      else
+13          v := ∞
+14          for each child of node
+15              v := min(v, alphabeta(child, depth - 1, α, β, TRUE))
+16              β := min(β, v)
+17              if β ≤ α
+18                  break (* α cut-off *)
+19          return v
+(* Initial call *)
+alphabeta(origin, depth, -∞, +∞, TRUE)         
+ */
+
+        private static double Score(INode node, double alpha, double beta, bool maximize)
         {
             if (node.Children.Any() == false)
                 return node.Score;
@@ -97,7 +88,7 @@ namespace TicTacToe.Engine
             {
                 foreach (var child in node.Children)
                 {
-                    score = Math.Max(score, Search(child, alpha, beta, !maximize));
+                    score = Math.Max(score, Score(child, alpha, beta, !maximize));
                     alpha = Math.Max(alpha, score);
                     if (beta <= alpha) break;
                 }
@@ -106,7 +97,7 @@ namespace TicTacToe.Engine
             {
                 foreach (var child in node.Children)
                 {
-                    score = Math.Min(score, Search(child, alpha, beta, !maximize));
+                    score = Math.Min(score, Score(child, alpha, beta, !maximize));
                     beta = Math.Min(beta, score);
                     if (beta <= alpha) break;
                 }
