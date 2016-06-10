@@ -1,5 +1,5 @@
 ﻿using System;
-using TicTacToe.ConsoleView;
+using TicTacToe.ConsoleUi;
 using TicTacToe.Engine;
 using TicTacToe.Game;
 
@@ -10,7 +10,7 @@ namespace TicTacToe.ConsoleApp
         private static void Main()
         {
             AiEngine engine = new AiEngine();
-            View view = new ConsoleView.ConsoleView();
+            ConsoleView view = new ConsoleView();
 
             XOGame game = new XOGame(engine, view);
 

@@ -43,9 +43,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleView\ConsoleView.csproj">
+    <ProjectReference Include="..\ConsoleView\ConsoleUi.csproj">
       <Project>{9a2e7200-e9b2-4e1b-87e1-70d9251524f5}</Project>
-      <Name>ConsoleView</Name>
+      <Name>ConsoleUi</Name>
     </ProjectReference>
     <ProjectReference Include="..\Game\Game.csproj">
       <Project>{c273f817-f6e6-43bd-ad96-d6700ba5b219}</Project>

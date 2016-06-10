@@ -1,17 +1,20 @@
-﻿using TicTacToe.ConsoleView;
-using TicTacToe.Model;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using TicTacToe.ConsoleUi;
+using TicTacToe.Engine;
 
 namespace TicTacToe.Game
 {
     public class XOGame
     {
-        private readonly Engine.AiEngine _engine;
-        private readonly View _view;
-        private char[,] _board = new char[3, 3];
-        private char _player;
-        private char _aiPlayer;
+        private readonly AiEngine _engine;
+        private readonly ConsoleView _view;
 
-        public XOGame(Engine.AiEngine engine, View view)
+        private const char None = '\0';
+        private const char Cat = 'C';
+
+        public XOGame(AiEngine engine, ConsoleView view)
         {
             _engine = engine;
             _view = view;
@@ -19,35 +22,95 @@ namespace TicTacToe.Game
 
         public void Play()
         {
-            _view.PickPlayers(out _player, out _aiPlayer);
+            var board = new char[3, 3];
+            char player;
+            char aiPlayer;
 
-            TicTacToeMove aiMove;
+            _view.PickPlayers(out player, out aiPlayer);
 
-            if (_aiPlayer == 'X')
+            if (aiPlayer == 'X')
             {
-                aiMove = _engine.GetMove(_board, _player, _aiPlayer);
-                _board = aiMove.Board;
-                _view.ShowBoard(_board, _player, _aiPlayer, aiMove: aiMove);
+                board = _engine.GetMove(board, player, aiPlayer);
+                _view.ShowBoard(board, player, aiPlayer);
             }
             else
             {
-                _view.ShowBoard(_board, _player, _aiPlayer);
-                aiMove = new TicTacToeMove(_board);
+                _view.ShowBoard(board, player, aiPlayer);
             }
 
-            while (aiMove.State == MoveState.Playing)
+            char winner = None;
+            do
             {
-                TicTacToeMove playerMove = _view.GetPlayerMove(_board, _player);
-                _board = playerMove.Board;
+                RowCol rowCol = _view.GetPlayerMove(board, player);
+                board[rowCol.Row, rowCol.Col] = player;
+                board = _engine.GetMove(board, player, aiPlayer);
+                winner = GetWinner(board, player, aiPlayer);
+                _view.ShowBoard(board, player, aiPlayer, winner);
+            } while (winner == None);
+        }
 
-                aiMove = _engine.GetMove(_board, _player, _aiPlayer);
-                _board = aiMove.Board;
+        public char GetWinner(char[,] board, char player, char aiPlayer)
+        {
+            int emptyCount = board.Flatten().Count(ch => ch == None);
+            int order = board.GetOrder();
 
-                _view.ShowBoard(_board, _player, _aiPlayer, playerMove, aiMove);
+            // All cells empty
+            if (emptyCount == order * order)
+                return None;
+
+            char winner = GetWinnerByLine(board);
+            if (winner != None) return winner;
+
+            // Check for Cat game
+            if (emptyCount == 0)
+                return Cat;
+
+            return None;
+        }
+
+        private static char GetWinnerByLine(char[,] board)
+        {
+            foreach (char player in GetWinnerForLine(board))
+            {
+                if (player != None) return player;
             }
 
-            _view.ShowState(aiMove);
+            return None;
+        }
 
+        private static IEnumerable<char> GetWinnerForLine(char[,] board)
+        {
+            int order = board.GetOrder();
+
+            for (int i = 0; i < order; i++)
+            {
+                // Check row
+                yield return FindWinner(board, order, i, 0, 0, 1);
+
+                // Check row
+                yield return FindWinner(board, order, 0, i, 1, 0);
+            }
+
+            // Check diagonals - top left to bottom right
+            yield return FindWinner(board, order, 0, 0, 1, 1);
+
+            // Check diagonals - bottom left to top right
+            yield return FindWinner(board, order, order - 1, 0, -1, 1);
+        }
+
+        private static char FindWinner(char[,] board, int order, int startRow, int startCol, int dr, int dc)
+        {
+            char firstField = board[startRow, startCol];
+            for (int i = 0; i < order; i++)
+            {
+                int r = startRow + dr * i;
+                int c = startCol + dc * i;
+
+                char cell = board[r, c];
+                if (cell != firstField) return None;
+            }
+
+            return firstField;
         }
 
     }

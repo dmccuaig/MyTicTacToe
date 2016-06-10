@@ -33,21 +33,18 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArrayExtensions.cs" />
     <Compile Include="XOGame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Model\Model.csproj">
-      <Project>{a7b1ac86-b2d6-497f-b2ee-b59d46049f44}</Project>
-      <Name>Model</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Engine\Engine.csproj">
       <Project>{9cae7664-9b7d-42e1-8238-e1802b80adc7}</Project>
       <Name>Engine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ConsoleView\ConsoleView.csproj">
+    <ProjectReference Include="..\ConsoleView\ConsoleUi.csproj">
       <Project>{9A2E7200-E9B2-4E1B-87E1-70D9251524F5}</Project>
-      <Name>ConsoleView</Name>
+      <Name>ConsoleUi</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,96 +1,84 @@
 using System;
 using System.Text.RegularExpressions;
-using TicTacToe.Model;
 
-namespace TicTacToe.ConsoleView
+namespace TicTacToe.ConsoleUi
 {
-    public class ConsoleView : View
+    public class ConsoleView // : View
     {
+        private const char PlayerX = 'X';
+        private const char PlayerO = 'O';
+        private const char None = '\0';
+        private const char Cat = 'C';
+
         readonly ConsoleReader _positionReader = new ConsoleReader("Move (1-9)", null, new Regex("[1-9]"));
 
-        public override void PickPlayers(out char player, out char aiPlayer)
+        public void PickPlayers(out char human, out char ai)
         {
             string response = ConsoleReader.GetString("X or O? (X goes first)", "X", new Regex("[XxOo]"));
-            player = response.ToUpper()[0];
-            aiPlayer = player == 'X' ? 'O' : 'X';
+            human = response.ToUpper()[0];
+            ai = human == 'X' ? 'O' : 'X';
         }
 
-        public override void ShowBoard(char[,] board, char player, char aiPlayer, TicTacToeMove playerMove = null, TicTacToeMove aiMove = null)
+        public void ShowBoard(char[,] board, char human, char aiPlayer, char winner = None)
         {
-            var playerColor = ConsoleColor.Yellow;
-            var aiColor = ConsoleColor.Magenta;
-
-            Console.WriteLine();
-            ShowMove("Player", player, playerColor, playerMove);
+            System.Console.WriteLine();
             int order = GetOrder(board);
 
-            Console.Write("   ");
+            System.Console.Write("   ");
             for (int i = 0; i < order; i++)
-                Console.Write(" {0} ", i);
-            Console.WriteLine();
+                System.Console.Write(" {0} ", i);
+            System.Console.WriteLine();
 
             ShowLine(order);
- 
+
             int posn = 1;
             for (int i = 0; i <order; i++)
             {
-                Console.Write(i + " |");
+                System.Console.Write(i + " |");
                 for (int j = 0; j < order; j++)
                 {
                     char cell = board[i, j];
-                    if(cell == player)
+                    if(cell == human)
                     {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write(" " + cell + " ");
+                        System.Console.ForegroundColor = ConsoleColor.Yellow;
+                        System.Console.Write(" " + cell + " ");
                     }
                     else if(cell == aiPlayer)
                     {
-                        Console.ForegroundColor = ConsoleColor.Magenta;
-                        Console.Write(" " + cell + " ");
+                        System.Console.ForegroundColor = ConsoleColor.Magenta;
+                        System.Console.Write(" " + cell + " ");
                     }
                     else
                     {
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(" " + posn + " ");
+                        System.Console.ForegroundColor = ConsoleColor.White;
+                        System.Console.Write(" " + posn + " ");
                     }
-                    Console.ResetColor();
+                    System.Console.ResetColor();
                     posn++;
                 }
-                Console.Write("|");
-                Console.WriteLine();
+                System.Console.Write("|");
+                System.Console.WriteLine();
                 ShowLine(order);
             }
 
-            ShowMove("AI", aiPlayer, aiColor, aiMove);
-            Console.WriteLine();
+            System.Console.WriteLine();
+
+            if(winner == human)
+                Console.WriteLine("You win!");
+            else if(winner == aiPlayer)
+                Console.WriteLine("Computer wins");
+            else if(winner == Cat)
+                Console.WriteLine("Cat Game");
         }
 
         private static void ShowLine(int order)
         {
-            Console.Write("  +");
-            Console.Write(new string('-', order * 3));
-            Console.WriteLine('+');
+            System.Console.Write("  +");
+            System.Console.Write(new string('-', order * 3));
+            System.Console.WriteLine('+');
         }
 
-        public override void ShowState(TicTacToeMove aiMove)
-        {
-            if (aiMove == null) return;
-
-            switch (aiMove.State)
-            {
-                case MoveState.CatGame:
-                    Console.WriteLine("No Winner");
-                    break;
-                case MoveState.AiWin:
-                    Console.WriteLine("AI Wins");
-                    break;
-                case MoveState.PlayerWin:
-                    Console.WriteLine("Player Wins");
-                    break;
-            }
-        }
-
-        public override TicTacToeMove GetPlayerMove(char[,] board, char player)
+        public RowCol GetPlayerMove(char[,] board, char player)
         {
             int order = GetOrder(board);
 
@@ -104,25 +92,10 @@ namespace TicTacToe.ConsoleView
                 if (row < order && col < order && board[row, col] == '\0')
                     break;
 
-                Console.WriteLine("Invalid move");
+                System.Console.WriteLine("Invalid move");
             };
 
-            return new TicTacToeMove(board, player: player, moveRow: row, moveCol: col);
-        }
-
-        private void ShowMove(string who, char player, ConsoleColor color, TicTacToeMove move)
-        {
-            if (move == null) return;
-            if (move.MoveRow == -1 || move.MoveCol == -1) return;
-
-            Console.Write("\n{0} ", who);
-            Console.Write('[');
-            Console.ForegroundColor = color;
-            Console.Write(player);
-            Console.ResetColor();
-            Console.Write(']');
-
-            Console.WriteLine(" moves ({0},{1})\n", move.MoveRow, move.MoveCol);
+            return new RowCol(row,col);
         }
 
         private static int GetOrder(char[,] board)

@@ -34,27 +34,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AiEngine.cs" />
-    <Compile Include="AI\AlphaBeta.cs" />
-    <Compile Include="AI\INode.cs" />
-    <Compile Include="AI\MiniMax.cs" />
-    <Compile Include="AI\Move.cs" />
-    <Compile Include="AI\NegaMax.cs" />
-    <Compile Include="AI\ScoredNode.cs" />
-    <Compile Include="AI\Search.cs" />
-    <Compile Include="Engine.FindWinner.cs" />
-    <Compile Include="Engine.Util.cs" />
+    <Compile Include="Search.cs" />
+    <Compile Include="Move.cs" />
+    <Compile Include="Node.cs" />
+    <Compile Include="ArrayExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AI\PVS.cs" />
     <Compile Include="TicTacToeNode.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleView\ConsoleView.csproj">
+    <ProjectReference Include="..\ConsoleView\ConsoleUi.csproj">
       <Project>{9a2e7200-e9b2-4e1b-87e1-70d9251524f5}</Project>
-      <Name>ConsoleView</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Model\Model.csproj">
-      <Project>{a7b1ac86-b2d6-497f-b2ee-b59d46049f44}</Project>
-      <Name>Model</Name>
+      <Name>ConsoleUi</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
