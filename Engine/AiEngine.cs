@@ -19,8 +19,8 @@ namespace TicTacToe.Engine
             Node node = new TicTacToeNode(Move.Opponent, triBoard);
             //var bestMove = (TicTacToeNode)Search.MiniMax(node);
             //var bestMove = (TicTacToeNode)Search.ParallelMiniMax(node);
-            //var bestMove = (TicTacToeNode)Search.AlphaBeta(node);
-            var bestMove = (TicTacToeNode) AlphaBeta.BestMove(node);
+            var bestMove = (TicTacToeNode)Search.AlphaBeta(node);
+            //var bestMove = (TicTacToeNode) AlphaBeta.BestMove(node);
             return bestMove.TriBoard;
         }
 
