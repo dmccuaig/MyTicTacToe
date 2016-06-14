@@ -10,5 +10,6 @@
         public abstract void PickPlayers(out char human, out char ai);
         public abstract void ShowBoard(char[,] board, char human, char aiPlayer, char winner = None);
         public abstract RowCol GetPlayerMove(char[,] board, char player);
+        public abstract bool DoesComputerGoFirst();
     }
 }

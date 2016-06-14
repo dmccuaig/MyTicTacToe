@@ -10,9 +10,15 @@ namespace TicTacToe.ConsoleUI
 
         public override void PickPlayers(out char human, out char ai)
         {
-            string response = ConsoleReader.GetString("X or O? (X goes first)", "X", new Regex("[XxOo]"));
+            string response = ConsoleReader.GetString("X or O?", "X", new Regex("[XxOo]"));
             human = response.ToUpper()[0];
             ai = human == 'X' ? 'O' : 'X';
+        }
+
+        public override bool DoesComputerGoFirst()
+        {
+            string response = ConsoleReader.GetString("Does the computer go first?", "N", new Regex("[YyNn]"));
+            return response.ToUpper()[0] == 'Y';
         }
 
         public override void ShowBoard(char[,] board, char human, char aiPlayer, char winner = None)

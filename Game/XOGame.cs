@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TicTacToe.ConsoleUI;
 using TicTacToe.Engine;
 using TicTacToe.UI;
 
@@ -10,9 +9,9 @@ namespace TicTacToe.Game
     public class XOGame
     {
         private readonly AiEngine _engine;
-        private readonly ConsoleView _view;
+        private readonly View _view;
 
-        public XOGame(AiEngine engine, ConsoleView view)
+        public XOGame(AiEngine engine, View view)
         {
             _engine = engine;
             _view = view;
@@ -25,8 +24,9 @@ namespace TicTacToe.Game
             char aiPlayer;
 
             _view.PickPlayers(out player, out aiPlayer);
+            ;
 
-            if (aiPlayer == 'X')    //TODO: This isn't good....
+            if (_view.DoesComputerGoFirst())    //TODO: This isn't good....
             {
                 board = _engine.GetMove(board, player, aiPlayer);
                 _view.ShowBoard(board, player, aiPlayer);
