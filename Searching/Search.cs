@@ -29,48 +29,83 @@ namespace TicTacToe.Tree
 
         public static Node AlphaBeta(Node node, bool maximize = true)
         {
-            return AlphaBeta(node, double.NegativeInfinity, double.PositiveInfinity, maximize);
-        }
-
-        public static Node AlphaBeta(Node node, double alpha, double beta, bool maximize)
-        {
             if (node.IsTerminal)
                 return node;
 
-            double score = maximize ? double.NegativeInfinity : double.PositiveInfinity;
+            var scoredNodes = new List<Node>();
 
-            Node n = node;
+            foreach (var child in node.Children)
+            {
+                child.Score = AlphaBeta(child, double.NegativeInfinity, double.PositiveInfinity, maximize);
+                scoredNodes.Add(child);
+            }
+
+            Node bestNode = maximize ? scoredNodes.Max() : scoredNodes.Min();
+            node.Score = bestNode.Score;
+
+            return bestNode;
+        }
+
+        #region doesntwork
+        //public static double AlphaBeta(Node node, double alpha, double beta, bool maximize)
+        //{
+        //    if (node.IsTerminal)
+        //        return node.Score;
+
+        //    double bestValue;
+        //    if (maximize)
+        //    {
+        //        bestValue = alpha;
+        //        foreach (var child in node.Children)
+        //        {
+        //            double childValue = AlphaBeta(child, bestValue, beta, false);
+        //            bestValue = Math.Max(bestValue, childValue);
+        //            if (beta <= bestValue) break;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        bestValue = beta;
+        //        foreach (var child in node.Children)
+        //        {
+        //            double childValue = AlphaBeta(child, alpha, bestValue, true);
+        //            bestValue = Math.Min(bestValue, childValue);
+        //            if (bestValue <= alpha) break;
+        //        }
+        //    }
+
+        //    return bestValue;
+        //}
+        #endregion
+
+        public static double AlphaBeta(Node node, double alpha, double beta, bool maximize)
+        {
+            if (node.IsTerminal)
+                return node.Score;
+
             if (maximize)
             {
+                double v = double.NegativeInfinity;
                 foreach (var child in node.Children)
                 {
-                    AlphaBeta(child, alpha, beta, !maximize);
-                    if (child.Score > score)
-                    {
-                        score = child.Score;
-                        n = child;
-                    }
-                    alpha = Math.Max(alpha, score);
+                    v = Math.Max(v, AlphaBeta(child, alpha, beta, false));
+                    alpha = Math.Max(alpha, v);
                     if (beta <= alpha) break;
                 }
+                return v;
             }
             else
             {
+                double v = double.PositiveInfinity;
                 foreach (var child in node.Children)
                 {
-                    AlphaBeta(child, alpha, beta, !maximize);
-                    if (child.Score < score)
-                    {
-                        score = child.Score;
-                        n = child;
-                    }
-                    beta = Math.Min(beta, score);
+                    v = Math.Min(v, AlphaBeta(child, alpha, beta, true));
+                    beta = Math.Min(beta, v);
                     if (beta <= alpha) break;
                 }
-            }
 
-            n.Score = score;
-            return n;
+                return v;
+            }
         }
 
         /*
@@ -97,63 +132,6 @@ namespace TicTacToe.Tree
         alphabeta(origin, depth, -∞, +∞, TRUE)
         */
 
-
-        /*
-01 function negamax(node, depth, color)
-02     if depth = 0 or node is a terminal node
-03         return color * the heuristic value of node
-
-04     bestValue := −∞
-05     foreach child of node
-06         v := −negamax(child, depth − 1, −color)
-07         bestValue := max( bestValue, v )
-08     return bestValue
-
-Initial call for Player A's root node
-rootNegamaxValue := negamax( rootNode, depth, 1)
-rootMinimaxValue := rootNegamaxValue
-Initial call for Player B's root node
-rootNegamaxValue := negamax( rootNode, depth, −1)
-rootMinimaxValue := −rootNegamaxValue
-*/
-
-        /*
-01 function negamax(node, depth, α, β, color)
-02     if depth = 0 or node is a terminal node
-03         return color * the heuristic value of node
-
-04     childNodes := GenerateMoves(node)
-05     childNodes := OrderMoves(childNodes)
-06     bestValue := −∞
-07     foreach child in childNodes
-08         v := −negamax(child, depth − 1, −β, −α, −color)
-09         bestValue := max( bestValue, v )
-10         α := max( α, v )
-11         if α ≥ β
-12             return β
-13     return bestValue
-Initial call for Player A's root node
-rootNegamaxValue := negamax( rootNode, depth, −∞, +∞, 1)
-*/
-
-        /*
-        *
-         function NegaScout(node, depth, α, β, color)
-   if node is a terminal node or depth = 0
-       return color × the heuristic value of node
-   for each child of node
-       if child is not first child
-           score := -pvs(child, depth-1, -α-1, -α, -color)       (* search with a null window *)
-           if α < score < β                                      (* if it failed high,
-               score := -pvs(child, depth-1, -β, -score, -color)        do a full re-search *)
-       else
-           score := -pvs(child, depth-1, -β, -α, -color)
-       α := max(α, score)
-       if α ≥ β
-           break                                            (* beta cut-off *)
-   return α
-   */
-
         public static Node ParallelMiniMax(Node node, bool maximize = true)
         {
             if (node.IsTerminal)
@@ -174,7 +152,6 @@ rootNegamaxValue := negamax( rootNode, depth, −∞, +∞, 1)
             return bestNode;
         }
 
-
     }
 
     public static class AlphaBeta
@@ -185,28 +162,46 @@ rootNegamaxValue := negamax( rootNode, depth, −∞, +∞, 1)
 
         public static Node BestMove(Node node)
         {
+            if (node.IsTerminal)
+                return node;
+
             bool maximizing = true;
-            //bool maximizing = node.Player == Maximize;
 
             var scoredNodes = GetScoredNodes(node, maximizing);
-            //var scoredNodes = ParallelGetScoredNodes(node, maximizing);
-            var bestScoredNode = maximizing ? scoredNodes.Max() : scoredNodes.Min();
-
-            return bestScoredNode;
+            if (maximizing)
+            {
+                var t = new Tuple<Node, double>(null,double.NegativeInfinity);
+                foreach (var tuple in scoredNodes)
+                {
+                    if (tuple.Item2 > t.Item2)
+                        t = tuple;
+                }
+                return t.Item1;
+            }
+            else
+            {
+                var t = new Tuple<Node, double>(null, double.PositiveInfinity);
+                foreach (var tuple in scoredNodes)
+                {
+                    if (tuple.Item2 < t.Item2)
+                        t = tuple;
+                }
+                return t.Item1;
+            }
         }
 
-        private static IEnumerable<Node> GetScoredNodes(Node node, bool maximizing)
+        private static IEnumerable<Tuple<Node, double>> GetScoredNodes(Node node, bool maximizing)
         {
-            var scoredNodes = new List<Node>();
+            var scoredNodes = new List<Tuple<Node,double>>();
 
             foreach (var child in node.Children)
             {
-                //scoredNodes.Add(
-                //    new Node(
-                //        child,
-                //        Search(child, double.NegativeInfinity, double.PositiveInfinity, !maximizing)
-                //    )
-                //);
+                scoredNodes.Add(
+                    Tuple.Create(
+                        child,
+                        Search(child, double.NegativeInfinity, double.PositiveInfinity, !maximizing)
+                    )
+                );
             }
 
             return scoredNodes;
