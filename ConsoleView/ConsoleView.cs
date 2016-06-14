@@ -1,84 +1,82 @@
 using System;
 using System.Text.RegularExpressions;
+using TicTacToe.UI;
 
-namespace TicTacToe.ConsoleUi
+namespace TicTacToe.ConsoleUI
 {
-    public class ConsoleView // : View
+    public class ConsoleView : View
     {
-        private const char PlayerX = 'X';
-        private const char PlayerO = 'O';
-        private const char None = '\0';
-        private const char Cat = 'C';
-
         readonly ConsoleReader _positionReader = new ConsoleReader("Move (1-9)", null, new Regex("[1-9]"));
 
-        public void PickPlayers(out char human, out char ai)
+        public override void PickPlayers(out char human, out char ai)
         {
             string response = ConsoleReader.GetString("X or O? (X goes first)", "X", new Regex("[XxOo]"));
             human = response.ToUpper()[0];
             ai = human == 'X' ? 'O' : 'X';
         }
 
-        public void ShowBoard(char[,] board, char human, char aiPlayer, char winner = None)
+        public override void ShowBoard(char[,] board, char human, char aiPlayer, char winner = None)
         {
-            System.Console.WriteLine();
+            Console.WriteLine();
             int order = GetOrder(board);
 
-            System.Console.Write("   ");
+           Console.Write("   ");
             for (int i = 0; i < order; i++)
-                System.Console.Write(" {0} ", i);
-            System.Console.WriteLine();
+               Console.Write(" {0} ", i);
+           Console.WriteLine();
 
             ShowLine(order);
 
             int posn = 1;
             for (int i = 0; i <order; i++)
             {
-                System.Console.Write(i + " |");
+               Console.Write(i + " |");
                 for (int j = 0; j < order; j++)
                 {
                     char cell = board[i, j];
                     if(cell == human)
                     {
-                        System.Console.ForegroundColor = ConsoleColor.Yellow;
-                        System.Console.Write(" " + cell + " ");
+                       Console.ForegroundColor = ConsoleColor.Yellow;
+                       Console.Write(" " + cell + " ");
                     }
                     else if(cell == aiPlayer)
                     {
-                        System.Console.ForegroundColor = ConsoleColor.Magenta;
-                        System.Console.Write(" " + cell + " ");
+                       Console.ForegroundColor = ConsoleColor.Magenta;
+                       Console.Write(" " + cell + " ");
                     }
                     else
                     {
-                        System.Console.ForegroundColor = ConsoleColor.White;
-                        System.Console.Write(" " + posn + " ");
+                       Console.ForegroundColor = ConsoleColor.White;
+                       Console.Write(" " + posn + " ");
                     }
-                    System.Console.ResetColor();
+                   Console.ResetColor();
                     posn++;
                 }
-                System.Console.Write("|");
-                System.Console.WriteLine();
+               Console.Write("|");
+               Console.WriteLine();
                 ShowLine(order);
             }
 
-            System.Console.WriteLine();
+           Console.WriteLine();
 
-            if(winner == human)
+            Console.ForegroundColor = ConsoleColor.White;
+            if (winner == human)
                 Console.WriteLine("You win!");
             else if(winner == aiPlayer)
                 Console.WriteLine("Computer wins");
             else if(winner == Cat)
                 Console.WriteLine("Cat Game");
+            Console.ResetColor();
         }
 
         private static void ShowLine(int order)
         {
-            System.Console.Write("  +");
-            System.Console.Write(new string('-', order * 3));
-            System.Console.WriteLine('+');
+           Console.Write("  +");
+           Console.Write(new string('-', order * 3));
+           Console.WriteLine('+');
         }
 
-        public RowCol GetPlayerMove(char[,] board, char player)
+        public override RowCol GetPlayerMove(char[,] board, char player)
         {
             int order = GetOrder(board);
 
@@ -89,11 +87,11 @@ namespace TicTacToe.ConsoleUi
                 int position = int.Parse(response) - 1;
                 row = position / order;
                 col = position % order;
-                if (row < order && col < order && board[row, col] == '\0')
+                if (row < order && col < order && board[row, col] == None)
                     break;
 
-                System.Console.WriteLine("Invalid move");
-            };
+               Console.WriteLine("Invalid move");
+            }
 
             return new RowCol(row,col);
         }

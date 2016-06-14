@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-using TicTacToe.Engine.AI;
+using TicTacToe.Tree;
 
 namespace TicTacToe.Engine
 {
@@ -12,112 +11,215 @@ namespace TicTacToe.Engine
         private const double WinValue = 1000;
 
         private readonly int _order;
-        private readonly sbyte _player;
+        private readonly int _rootPlayer;
         private readonly int _depth;
-        private readonly sbyte _toPlay;
-        private sbyte _winner;
-        private readonly Lazy<bool> _isTerminal;
+        private readonly int _player;
+        private int _winner;
+        private int _playedCells;
+        private readonly bool _isTerminal;
 
-        public sbyte[,] TriBoard { get; }
+        private readonly int[] _rowCounts, _colCounts;
+        private int _diagCounts;
+        private int _backDiagCounts;
 
-        public override bool IsTerminal => _isTerminal.Value;
+        public int[,] TriBoard { get; }
+
+        public override bool IsTerminal => _isTerminal;
 
         public override IEnumerable<Node> Children
         {
             get
             {
-                if (IsTerminal)
-                    yield break;
+                if (IsTerminal) yield break;
 
-                for (int i = 0; i < _order; i++)
+                for (int row = 0; row < _order; row++)
                 {
-                    for (int j = 0; j < _order; j++)
+                    for (int col = 0; col < _order; col++)
                     {
-                        if (TriBoard[i, j] != Move.None) continue;
-
-                        var childBoard = TriBoard.CloneArray();
-                        childBoard[i, j] = _toPlay;
-                        var childNode = new TicTacToeNode(_player, childBoard, Move.Negate(_toPlay), _depth + 1);
-                        yield return childNode;
+                        if (TriBoard[row, col] != Move.None) continue;
+                        yield return new TicTacToeNode(this, row, col);
                     }
                 }
             }
         }
 
-        public TicTacToeNode(sbyte player, sbyte[,] triBoard, sbyte toPlay, int depth = 0)
+        public TicTacToeNode(int rootPlayer, int[,] triBoard)
         {
             TriBoard = triBoard;
             _order = triBoard.GetOrder();
-            _player = player;
-            _depth = depth;
-            _toPlay = toPlay;
-            _isTerminal = new Lazy<bool>(() => GetTerminalState());
+            _rootPlayer = rootPlayer;
+            _depth = 0;
+            _player = -rootPlayer;
+            _rowCounts = new int[_order];
+            _colCounts = new int[_order];
+
+            Tally();
+            _isTerminal = GetTerminalState();
+            Score = _isTerminal ? _rootPlayer * _winner * WinValue : 0;
+            //ToDebug();
         }
 
-        private bool GetTerminalState()
+        public TicTacToeNode(TicTacToeNode parent, int row, int col)
         {
-            int emptyCount = TriBoard.Flatten().Count(cell => cell == Move.None);
-            if (emptyCount == _order * _order) return false; // Empty board
+            TriBoard = parent.TriBoard.CloneArray();
+            _order = parent._order;
+            _rootPlayer = parent._rootPlayer;
+            _depth = parent._depth + 1;
+            _player = -parent._player;
+            _rowCounts = (int[])parent._rowCounts.Clone();
+            _colCounts = (int[])parent._colCounts.Clone();
+            _diagCounts = parent._diagCounts;
+            _backDiagCounts = parent._backDiagCounts;
 
-            _winner = GetWinnerForLine().FirstOrDefault(p => p != Move.None);
-            Score = _winner == default(sbyte) ? 0 :  _player * _winner * WinValue;
-            return _winner != Move.None || emptyCount == 0;  // Terminal if there is a winner or full board
+            TriBoard[row, col] = _player;
+            _playedCells = parent._playedCells + 1;
+
+            ChildTally(row, col);
+            _isTerminal = GetChildTerminalState(row, col);
+            Score = _isTerminal ? _rootPlayer * _winner * WinValue : 0;
+           // ToDebug();
         }
 
-        private IEnumerable<sbyte> GetWinnerForLine()
+        public void Tally()
         {
-            for (int i = 0; i < _order; i++)
+            // Tally up rows and columns
+            for (int row = 0; row < _order; row++)
             {
-                // Check row
-                yield return FindWinner(i, 0, 0, 1);
+                for (int col = 0; col < _order; col++)
+                {
+                    _rowCounts[row] += TriBoard[row, col];
+                    _colCounts[col] += TriBoard[row, col];
 
-                // Check row
-                yield return FindWinner(0, i, 1, 0);
+                    _playedCells += Math.Abs(TriBoard[row, col]);
+                }
             }
 
-            // Check diagonals - top left to bottom right
-            yield return FindWinner(0, 0, 1, 1);
-
-            // Check diagonals - bottom left to top right
-
-            yield return FindWinner(_order - 1, 0, -1, 1);
-        }
-
-        private sbyte FindWinner(int startRow, int startCol, int dr, int dc)
-        {
-            sbyte firstField = TriBoard[startRow, startCol];
-            for (int i = 0; i < _order; i++)
+            // Tally up diagonal
+            for (int rc = 0; rc < _order; rc++)
             {
-                int r = startRow + dr * i;
-                int c = startCol + dc * i;
-
-                sbyte cell = TriBoard[r, c];
-                if (cell != firstField) return Move.None;
+                _diagCounts += TriBoard[rc, rc];
             }
 
-            return firstField;
+            // Tally up reverse dialogal
+            for (int r = 0, c = _order - 1; r < _order; r++, c--)
+            {
+                _backDiagCounts += TriBoard[r, c];
+            }
+        }
+
+        public void ChildTally(int row, int col)
+        {
+            _rowCounts[row] += TriBoard[row, col];
+            _colCounts[col] += TriBoard[row, col];
+
+            if (row == col)
+                _diagCounts += TriBoard[row, col];
+
+            if (row + col == _order - 1)
+                _backDiagCounts += TriBoard[row, col];
+        }
+
+        public bool GetTerminalState()
+        {
+            // Can't be terminal until enough cells played
+            if (_playedCells < _order) return false;
+
+            //(i + (i >> 31)) ^ (i >> 31) <--> Math.Abs
+            int cmpValue = _diagCounts;
+            if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+            {
+                _winner = _player;
+                return true;
+            }
+
+            cmpValue = _backDiagCounts;
+            if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+            {
+                _winner = _player;
+                return true;
+            }
+
+            for (int i = 0; i < _order; i++)
+            {
+                cmpValue = _rowCounts[i];
+                if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+                {
+                    _winner = _player;
+                    return true;
+                }
+
+                cmpValue = _colCounts[i];
+                if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+                {
+                    _winner = _player;
+                    return true;
+                }
+            }
+
+            // Cat game
+            if (_playedCells == _order * _order) return true;
+
+            return false;
+        }
+
+        public bool GetChildTerminalState(int row, int col)
+        {
+            // Can't be terminal until enough cells played
+            if (_playedCells < _order) return false;
+
+            //(i + (i >> 31)) ^ (i >> 31) <--> Math.Abs
+            int cmpValue = _diagCounts;
+            if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+            {
+                _winner = _player;
+                return true;
+            }
+
+            cmpValue = _backDiagCounts;
+            if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+            {
+                _winner = _player;
+                return true;
+            }
+
+            cmpValue = _rowCounts[row];
+            if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+            {
+                _winner = _player;
+                return true;
+            }
+
+            cmpValue = _colCounts[col];
+            if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+            {
+                _winner = _player;
+                return true;
+            }
+
+            // Cat game
+            if (_playedCells == _order * _order) return true;
+
+            return false;
         }
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("{ ");
             for (int i = 0; i < _order; i++)
             {
                 sb.Append("{");
                 for (int j = 0; j < _order; j++)
                 {
-                    sbyte cell = TriBoard[i, j];
+                    int cell = TriBoard[i, j];
                     sb.Append(" " + ToFriendly(cell));
                 }
                 sb.Append("}\n");
             }
-            sb.Append(" }");
-            sb.Append($" Player: {ToFriendly(_player)} M: {ToFriendly(_toPlay)} W: {ToFriendly(_winner)} Depth: {_depth}, Score: {Score}");
+            sb.Append($" Player: {ToFriendly(_rootPlayer)} M: {ToFriendly(_player)} W: {ToFriendly(_winner)} Depth: {_depth}, Score: {Score}");
             return sb.ToString();
         }
 
-        private char ToFriendly(sbyte mover)
+        private char ToFriendly(int mover)
         {
             switch (mover)
             {
@@ -129,6 +231,21 @@ namespace TicTacToe.Engine
                     return '_';
             }
         }
+
+        //private void ToDebug()
+        //{
+        //    Debug.WriteLine("");
+        //    Debug.WriteLine(this);
+        //    Debug.WriteLine("IsTerminal="+_isTerminal);
+        //    Debug.WriteLine("DiagCount="+_diagCounts+" BackDiagCounts="+_backDiagCounts);
+        //    Debug.Write("RowCounts=");
+        //    for(int i = 0; i < _order; i++) Debug.Write(_rowCounts[i]+",");
+        //    Debug.WriteLine("");
+        //    Debug.Write("ColCounts=");
+        //    for (int i = 0; i < _order; i++) Debug.Write(_colCounts[i] + ",");
+        //    Debug.WriteLine("");
+
+        //}
 
     }
 }

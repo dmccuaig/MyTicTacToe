@@ -7,8 +7,8 @@
     <ProjectGuid>{9A2E7200-E9B2-4E1B-87E1-70D9251524F5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TicTacToe.ConsoleUi</RootNamespace>
-    <AssemblyName>TicTacToe.ConsoleUi</AssemblyName>
+    <RootNamespace>TicTacToe.ConsoleUI</RootNamespace>
+    <AssemblyName>TicTacToe.ConsoleUI</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -36,8 +36,12 @@
     <Compile Include="ConsoleReader.cs" />
     <Compile Include="ConsoleView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RowCol.cs" />
-    <Compile Include="View.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UI\UI.csproj">
+      <Project>{84d7fd11-9809-4fe0-8a23-130b7fd043ce}</Project>
+      <Name>UI</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

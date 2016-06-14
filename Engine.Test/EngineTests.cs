@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using TicTacToe.Engine;
-using TicTacToe.Engine.AI;
 
 namespace Engine.Test
 {
@@ -26,14 +25,14 @@ namespace Engine.Test
                 {O,X,X},
                 };
 
-            var t1 = new sbyte[,]
+            var t1 = new int[,]
             {
                 { 1,-1, 1},
                 { 1,-1,-1},
                 {-1, 1, 1},
             };
 
-            var t2 = new sbyte[,]
+            var t2 = new int[,]
             {
                 {-1, 1,-1},
                 {-1, 1, 1},
@@ -108,5 +107,10 @@ namespace Engine.Test
 
         }
 
+        [Test]
+        public void TallyTest1()
+        {
+            
+        }
     }
 }

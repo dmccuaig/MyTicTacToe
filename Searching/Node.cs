@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TicTacToe.Engine.AI
+namespace TicTacToe.Tree
 {
     public abstract class Node : IComparable<Node>
     {
-        public virtual double Score { get; set; }
+        public double Score { get; set; }
         public abstract IEnumerable<Node> Children { get; }
         public abstract bool IsTerminal { get; }
 

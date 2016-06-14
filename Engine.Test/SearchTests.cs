@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using TicTacToe.Engine;
-using TicTacToe.Engine.AI;
 
 namespace Engine.Test
 {
@@ -8,73 +7,73 @@ namespace Engine.Test
     {
         readonly AiEngine _engine = new AiEngine();
 
-        const sbyte P = Move.Player, O = Move.Opponent, _ = Move.None;
+        const int P = Move.Player, O = Move.Opponent, _ = Move.None;
 
-        sbyte[,] b0 = new sbyte[,]
+        int[,] b0 = new int[,]
         {
             {_,_,_},
             {_,_,_},
             {_,_,_},
         };
 
-        sbyte[,] b1 = new sbyte[,]
+        int[,] b1 = new int[,]
         {
             {P,_,_},
             {_,_,_},
             {_,_,_},
         };
 
-        sbyte[,] b2 = new sbyte[,]
+        int[,] b2 = new int[,]
         {
             {P,_,_},
             {_,O,_},
             {_,_,_},
         };
-        sbyte[,] b3 = new sbyte[,]
+        int[,] b3 = new int[,]
         {
             {P,_,_},
             {_,O,_},
             {_,_,P},
         };
-        sbyte[,] b4 = new sbyte[,]
+        int[,] b4 = new int[,]
         {
             {P,O,_},
             {_,O,_},
             {_,_,P},
         };
-        sbyte[,] b5 = new sbyte[,]
+        int[,] b5 = new int[,]
         {
             {P,O,_},
             {_,O,_},
             {_,P,P},
         };
-        sbyte[,] b6 = new sbyte[,]
+        int[,] b6 = new int[,]
         {
             {P,O,_},
             {_,O,_},
             {O,P,P},
         };
-        sbyte[,] b7 = new sbyte[,]
+        int[,] b7 = new int[,]
         {
             {P,O,_},
             {_,O,P},
             {O,P,P},
         };
-        sbyte[,] b8 = new sbyte[,]
+        int[,] b8 = new int[,]
         {
             {P,O,O},
             {_,O,P},
             {O,P,P},
         };
 
-        sbyte[,] c0 = new sbyte[,]
+        int[,] c0 = new int[,]
 {
             {O,P,P},
             {_,O,_},
             {_,O,P},
 };
 
-        sbyte[,] c1 = new sbyte[,]
+        int[,] c1 = new int[,]
 {
             {O,P,P},
             {_,O,O},

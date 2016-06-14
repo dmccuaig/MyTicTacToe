@@ -1,21 +1,21 @@
 using System;
 
-namespace TicTacToe.Engine.AI
+namespace TicTacToe.Engine
 {
     public static class Move
     {
-        public const sbyte Opponent = -1;
-        public const sbyte None = default(sbyte);   // same as zero
-        public const sbyte Player = 1;
+        public const int Opponent = -1;
+        public const int None = default(int);   // same as zero
+        public const int Player = 1;
 
-        public static sbyte ConvertTo<TFrom>(TFrom value, TFrom player, TFrom opponent)
+        public static int ConvertTo<TFrom>(TFrom value, TFrom player, TFrom opponent)
         {
-            if (value.Equals(player)) return Move.Player;
-            if (value.Equals(opponent)) return Move.Opponent;
-            return Move.None;
+            if (value.Equals(player)) return Player;
+            if (value.Equals(opponent)) return Opponent;
+            return None;
         }
 
-        public static TTo ConvertTo<TTo>(sbyte value, TTo player, TTo opponent, TTo none)
+        public static TTo ConvertTo<TTo>(int value, TTo player, TTo opponent, TTo none)
         {
             switch (value)
             {
@@ -28,16 +28,6 @@ namespace TicTacToe.Engine.AI
                 default:
                     throw new ApplicationException("Bad value");
             }
-        }
-
-        public static sbyte Multiply(sbyte a, sbyte b)
-        {
-            return (sbyte) (a*b);
-        }
-
-        public static sbyte Negate(sbyte a)
-        {
-            return (sbyte) -a;
         }
 
     }

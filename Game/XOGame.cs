@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TicTacToe.ConsoleUi;
+using TicTacToe.ConsoleUI;
 using TicTacToe.Engine;
+using TicTacToe.UI;
 
 namespace TicTacToe.Game
 {
@@ -10,9 +11,6 @@ namespace TicTacToe.Game
     {
         private readonly AiEngine _engine;
         private readonly ConsoleView _view;
-
-        private const char None = '\0';
-        private const char Cat = 'C';
 
         public XOGame(AiEngine engine, ConsoleView view)
         {
@@ -28,7 +26,7 @@ namespace TicTacToe.Game
 
             _view.PickPlayers(out player, out aiPlayer);
 
-            if (aiPlayer == 'X')
+            if (aiPlayer == 'X')    //TODO: This isn't good....
             {
                 board = _engine.GetMove(board, player, aiPlayer);
                 _view.ShowBoard(board, player, aiPlayer);
@@ -38,7 +36,7 @@ namespace TicTacToe.Game
                 _view.ShowBoard(board, player, aiPlayer);
             }
 
-            char winner = None;
+            char winner;
             do
             {
                 RowCol rowCol = _view.GetPlayerMove(board, player);
@@ -46,36 +44,36 @@ namespace TicTacToe.Game
                 board = _engine.GetMove(board, player, aiPlayer);
                 winner = GetWinner(board, player, aiPlayer);
                 _view.ShowBoard(board, player, aiPlayer, winner);
-            } while (winner == None);
+            } while (winner == View.None);
         }
 
         public char GetWinner(char[,] board, char player, char aiPlayer)
         {
-            int emptyCount = board.Flatten().Count(ch => ch == None);
+            int emptyCount = board.Flatten().Count(ch => ch == View.None);
             int order = board.GetOrder();
 
             // All cells empty
             if (emptyCount == order * order)
-                return None;
+                return View.None;
 
             char winner = GetWinnerByLine(board);
-            if (winner != None) return winner;
+            if (winner != View.None) return winner;
 
             // Check for Cat game
             if (emptyCount == 0)
-                return Cat;
+                return View.Cat;
 
-            return None;
+            return View.None;
         }
 
         private static char GetWinnerByLine(char[,] board)
         {
             foreach (char player in GetWinnerForLine(board))
             {
-                if (player != None) return player;
+                if (player != View.None) return player;
             }
 
-            return None;
+            return View.None;
         }
 
         private static IEnumerable<char> GetWinnerForLine(char[,] board)
@@ -107,7 +105,7 @@ namespace TicTacToe.Game
                 int c = startCol + dc * i;
 
                 char cell = board[r, c];
-                if (cell != firstField) return None;
+                if (cell != firstField) return View.None;
             }
 
             return firstField;

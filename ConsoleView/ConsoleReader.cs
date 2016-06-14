@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace TicTacToe.ConsoleUi
+namespace TicTacToe.ConsoleUI
 {
     public class ConsoleReader
     {
@@ -24,7 +24,7 @@ namespace TicTacToe.ConsoleUi
 
         public static string GetString(string prompt, string def = null, Regex allowable = null)
         {
-            ConsoleReader reader = new ConsoleReader(prompt, def, allowable);
+            var reader = new ConsoleReader(prompt, def, allowable);
             return reader.GetString();
         }
 

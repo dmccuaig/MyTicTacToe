@@ -1,4 +1,4 @@
-﻿namespace TicTacToe.ConsoleUi
+﻿namespace TicTacToe.UI
 {
     public class RowCol
     {

@@ -1,5 +1,5 @@
 ﻿using System;
-using TicTacToe.ConsoleUi;
+using TicTacToe.ConsoleUI;
 using TicTacToe.Engine;
 using TicTacToe.Game;
 
