@@ -6,7 +6,7 @@ namespace TicTacToe.ConsoleUI
 {
     public class ConsoleView : View
     {
-        readonly ConsoleReader _positionReader = new ConsoleReader("Move (1-9)", null, new Regex("[1-9]"));
+        readonly ConsoleReader _positionReader = new ConsoleReader("Move: ", null, new Regex("[1-9]+"));
 
         public override void PickPlayers(out char human, out char ai)
         {
@@ -28,7 +28,7 @@ namespace TicTacToe.ConsoleUI
 
            Console.Write("   ");
             for (int i = 0; i < order; i++)
-               Console.Write(" {0} ", i);
+               Console.Write("  {0} ", i);
            Console.WriteLine();
 
             ShowLine(order);
@@ -43,17 +43,17 @@ namespace TicTacToe.ConsoleUI
                     if(cell == human)
                     {
                        Console.ForegroundColor = ConsoleColor.Yellow;
-                       Console.Write(" " + cell + " ");
+                       Console.Write("  " + cell + " ");
                     }
                     else if(cell == aiPlayer)
                     {
                        Console.ForegroundColor = ConsoleColor.Magenta;
-                       Console.Write(" " + cell + " ");
+                       Console.Write("  " + cell + " ");
                     }
                     else
                     {
                        Console.ForegroundColor = ConsoleColor.White;
-                       Console.Write(" " + posn + " ");
+                       Console.Write(" {0,2} ", posn);
                     }
                    Console.ResetColor();
                     posn++;
@@ -78,7 +78,7 @@ namespace TicTacToe.ConsoleUI
         private static void ShowLine(int order)
         {
            Console.Write("  +");
-           Console.Write(new string('-', order * 3));
+           Console.Write(new string('-', order * 4));
            Console.WriteLine('+');
         }
 

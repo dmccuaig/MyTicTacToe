@@ -10,6 +10,7 @@ namespace TicTacToe.Game
     {
         private readonly AiEngine _engine;
         private readonly View _view;
+        private const int Order = 4;
 
         public XOGame(AiEngine engine, View view)
         {
@@ -19,14 +20,14 @@ namespace TicTacToe.Game
 
         public void Play()
         {
-            var board = new char[3, 3];
+            var board = new char[Order, Order];
             char player;
             char aiPlayer;
 
             _view.PickPlayers(out player, out aiPlayer);
             ;
 
-            if (_view.DoesComputerGoFirst())    //TODO: This isn't good....
+            if (_view.DoesComputerGoFirst())
             {
                 board = _engine.GetMove(board, player, aiPlayer);
                 _view.ShowBoard(board, player, aiPlayer);

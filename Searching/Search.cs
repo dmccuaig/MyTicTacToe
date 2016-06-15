@@ -75,8 +75,7 @@ namespace TicTacToe.Tree
 
         public static Node ParallelMiniMax(Node node, bool maximize = true)
         {
-            if (node.IsTerminal)
-                return node;
+            if (node.IsTerminal) return node;
 
             var scoredNodes = new ConcurrentBag<Node>();
             Action<Node> processNodes = child =>
@@ -92,5 +91,25 @@ namespace TicTacToe.Tree
 
             return bestNode;
         }
+
+        public static Node ParallelAlphaBeta(Node node, bool maximize = true)
+        {
+            if (node.IsTerminal) return node;
+
+            var scoredNodes = new ConcurrentBag<Node>();
+            Action<Node> processNodes = child =>
+            {
+                child.Score = AlphaBeta(child, double.NegativeInfinity, double.PositiveInfinity, !maximize);
+                scoredNodes.Add(child);
+            };
+
+            Parallel.ForEach(node.Children, processNodes);
+
+            Node bestNode = maximize ? scoredNodes.Max() : scoredNodes.Min();
+            node.Score = bestNode.Score;
+
+            return bestNode;
+        }
+
     }
 }

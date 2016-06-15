@@ -61,17 +61,27 @@ namespace TicTacToe.Engine
 
         public TicTacToeNode(TicTacToeNode parent, int row, int col)
         {
-            TriBoard = parent.TriBoard.CloneArray();
             _order = parent._order;
             _rootPlayer = parent._rootPlayer;
             _depth = parent._depth + 1;
             _player = -parent._player;
-            _rowCounts = (int[])parent._rowCounts.Clone();
-            _colCounts = (int[])parent._colCounts.Clone();
+
+            _rowCounts = new int[_order];
+            _colCounts = new int[_order];
+            for (int i = 0; i < _order; i++)
+            {
+                _rowCounts[i] = parent._rowCounts[i];
+                _colCounts[i] = parent._colCounts[i];
+            }
             _diagCounts = parent._diagCounts;
             _backDiagCounts = parent._backDiagCounts;
 
+            TriBoard = new int[_order, _order];
+            for (int i = 0; i < _order; i++)
+                for (int j = 0; j < _order; j++)
+                    TriBoard[i, j] = parent.TriBoard[i, j];
             TriBoard[row, col] = _player;
+
             _playedCells = parent._playedCells + 1;
 
             ChildTally(row, col);
@@ -87,10 +97,12 @@ namespace TicTacToe.Engine
             {
                 for (int col = 0; col < _order; col++)
                 {
-                    _rowCounts[row] += TriBoard[row, col];
-                    _colCounts[col] += TriBoard[row, col];
+                    int cellValue = TriBoard[row, col];
+                    _rowCounts[row] += cellValue;
+                    _colCounts[col] += cellValue;
 
-                    _playedCells += Math.Abs(TriBoard[row, col]);
+                    if (cellValue != Move.None)
+                        _playedCells++;
                 }
             }
 
@@ -109,14 +121,15 @@ namespace TicTacToe.Engine
 
         public void ChildTally(int row, int col)
         {
-            _rowCounts[row] += TriBoard[row, col];
-            _colCounts[col] += TriBoard[row, col];
+            int cell = TriBoard[row, col];
+            _rowCounts[row] += cell;
+            _colCounts[col] += cell;
 
             if (row == col)
-                _diagCounts += TriBoard[row, col];
+                _diagCounts += cell;
 
             if (row + col == _order - 1)
-                _backDiagCounts += TriBoard[row, col];
+                _backDiagCounts += cell;
         }
 
         public bool GetTerminalState()
@@ -124,16 +137,13 @@ namespace TicTacToe.Engine
             // Can't be terminal until enough cells played
             if (_playedCells < _order) return false;
 
-            //(i + (i >> 31)) ^ (i >> 31) <--> Math.Abs
-            int cmpValue = _diagCounts;
-            if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+            if (_diagCounts == _order || _diagCounts == -_order)
             {
                 _winner = _player;
                 return true;
             }
 
-            cmpValue = _backDiagCounts;
-            if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+            if (_backDiagCounts == _order || _backDiagCounts == -_order)
             {
                 _winner = _player;
                 return true;
@@ -141,15 +151,15 @@ namespace TicTacToe.Engine
 
             for (int i = 0; i < _order; i++)
             {
-                cmpValue = _rowCounts[i];
-                if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+                int rowCount = _rowCounts[i];
+                if (rowCount == _order || rowCount == -_order)
                 {
                     _winner = _player;
                     return true;
                 }
 
-                cmpValue = _colCounts[i];
-                if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+                int colCount = _colCounts[i];
+                if (colCount == _order || colCount == -_order)
                 {
                     _winner = _player;
                     return true;
@@ -167,30 +177,27 @@ namespace TicTacToe.Engine
             // Can't be terminal until enough cells played
             if (_playedCells < _order) return false;
 
-            //(i + (i >> 31)) ^ (i >> 31) <--> Math.Abs
-            int cmpValue = _diagCounts;
-            if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+            if (_diagCounts == _order || _diagCounts == -_order)
             {
                 _winner = _player;
                 return true;
             }
 
-            cmpValue = _backDiagCounts;
-            if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+            if (_backDiagCounts == _order || _backDiagCounts == -_order)
             {
                 _winner = _player;
                 return true;
             }
 
-            cmpValue = _rowCounts[row];
-            if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+            int rowCount = _rowCounts[row];
+            if (rowCount == _order || rowCount == -_order)
             {
                 _winner = _player;
                 return true;
             }
 
-            cmpValue = _colCounts[col];
-            if (((cmpValue + (cmpValue >> 31)) ^ (cmpValue >> 31)) == _order)
+            int colCount = _colCounts[col];
+            if (colCount == _order || colCount == -_order)
             {
                 _winner = _player;
                 return true;
