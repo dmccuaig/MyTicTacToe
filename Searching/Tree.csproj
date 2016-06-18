@@ -76,7 +76,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ParallelMinimax\Minimax.cs" />
     <Compile Include="Node.cs" />
+    <Compile Include="ParallelMinimax\MinimaxMove.cs" />
+    <Compile Include="ParallelMinimax\MinimaxSpot.cs" />
+    <Compile Include="ParallelMinimax\TicTacToeMinimax.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Search.cs" />
   </ItemGroup>

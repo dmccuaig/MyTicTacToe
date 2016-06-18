@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -31,46 +32,58 @@ namespace TicTacToe.Tree
         {
             if (node.IsTerminal) return node;
 
-            var scoredNodes = new List<Node>();
+            return maximize
+                ? AlphaBetaMax(node)
+                : AlphaBetaMin(node);
+        }
+
+        public static Node ParallelAlphaBeta(Node node, bool maximize = true)
+        {
+            if (node.IsTerminal) return node;
+
+            return maximize
+                ? ParallelAlphaBetaMax(node)
+                : ParallelAlphaBetaMin(node);
+        }
+
+        public static Node AlphaBetaMax(Node node, double alpha = double.NegativeInfinity, double beta = double.PositiveInfinity)
+        {
+            if (node.IsTerminal) return node;
+
+            Node best = Node.MinimalNode;
 
             foreach (var child in node.Children)
             {
-                child.Score = AlphaBeta(child, double.NegativeInfinity, double.PositiveInfinity, !maximize);
-                scoredNodes.Add(child);
+                AlphaBetaMin(child, alpha, beta);
+                if (child.Score > best.Score)
+                    best = child;
+
+                alpha = Math.Max(alpha, best.Score);
+                if (beta <= alpha) break;
             }
 
-            Node bestNode = maximize ? scoredNodes.Max() : scoredNodes.Min();
-            node.Score = bestNode.Score;
-
-            return bestNode;
+            node.Score = best.Score;
+            return best;
         }
 
-        public static double AlphaBeta(Node node, double alpha, double beta, bool maximize)
+        public static Node AlphaBetaMin(Node node, double alpha = double.NegativeInfinity, double beta = double.PositiveInfinity)
         {
-            if (node.IsTerminal) return node.Score;
+            if (node.IsTerminal) return node;
 
-            double score = maximize ? double.NegativeInfinity : double.PositiveInfinity;
+            Node best = Node.MaximalNode;
 
-            if (maximize)
+            foreach (var child in node.Children)
             {
-                foreach (var child in node.Children)
-                {
-                    score = Math.Max(score, AlphaBeta(child, alpha, beta, false));
-                    alpha = Math.Max(alpha, score);
-                    if (beta <= alpha) break;
-                }
-            }
-            else
-            {
-                foreach (var child in node.Children)
-                {
-                    score = Math.Min(score, AlphaBeta(child, alpha, beta, true));
-                    beta = Math.Min(beta, score);
-                    if (beta <= alpha) break;
-                }
+                AlphaBetaMax(child, alpha, beta);
+                if (child.Score < best.Score)
+                    best = child;
+
+                beta = Math.Min(beta, best.Score);
+                if (beta <= alpha) break;
             }
 
-            return score;
+            node.Score = best.Score;
+            return best;
         }
 
         public static Node ParallelMiniMax(Node node, bool maximize = true)
@@ -92,20 +105,38 @@ namespace TicTacToe.Tree
             return bestNode;
         }
 
-        public static Node ParallelAlphaBeta(Node node, bool maximize = true)
+        public static Node ParallelAlphaBetaMax(Node node, double alpha = double.NegativeInfinity, double beta = double.PositiveInfinity)
         {
             if (node.IsTerminal) return node;
 
-            var scoredNodes = new ConcurrentBag<Node>();
-            Action<Node> processNodes = child =>
+            var children = new ConcurrentBag<Node>();
+            Action<Node> scoreNodes = child =>
             {
-                child.Score = AlphaBeta(child, double.NegativeInfinity, double.PositiveInfinity, !maximize);
-                scoredNodes.Add(child);
+                AlphaBetaMin(child);
+                children.Add(child);
             };
 
-            Parallel.ForEach(node.Children, processNodes);
+            Parallel.ForEach(node.Children, scoreNodes);
 
-            Node bestNode = maximize ? scoredNodes.Max() : scoredNodes.Min();
+            Node bestNode = children.Max();
+            node.Score = bestNode.Score;
+
+            return bestNode;
+        }
+        public static Node ParallelAlphaBetaMin(Node node)
+        {
+            if (node.IsTerminal) return node;
+
+            var children = new ConcurrentBag<Node>();
+            Action<Node> scoreNodes = child =>
+            {
+                AlphaBetaMax(child);
+                children.Add(child);
+            };
+
+            Parallel.ForEach(node.Children, scoreNodes);
+
+            Node bestNode = children.Min();
             node.Score = bestNode.Score;
 
             return bestNode;

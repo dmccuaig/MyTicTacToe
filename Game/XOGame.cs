@@ -10,7 +10,7 @@ namespace TicTacToe.Game
     {
         private readonly AiEngine _engine;
         private readonly View _view;
-        private const int Order = 4;
+        private const int Order = 3;
 
         public XOGame(AiEngine engine, View view)
         {
