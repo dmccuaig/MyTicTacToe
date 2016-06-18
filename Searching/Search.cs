@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -107,39 +106,58 @@ namespace TicTacToe.Tree
 
         public static Node ParallelAlphaBetaMax(Node node, double alpha = double.NegativeInfinity, double beta = double.PositiveInfinity)
         {
-            if (node.IsTerminal) return node;
+            Node best = Node.MinimalNode;
+            object lockObject = new object();
+            double score = best.Score;
 
-            var children = new ConcurrentBag<Node>();
-            Action<Node> scoreNodes = child =>
+            Action<Node,ParallelLoopState> processChildren = (child,state) =>
             {
-                AlphaBetaMin(child);
-                children.Add(child);
+                AlphaBetaMin(child, alpha, beta);
+                    lock (lockObject)
+                    {
+                        if (child.Score > score)
+                        {
+                            best = child;
+                            score = best.Score;
+                        }
+                }
+
+                alpha = Math.Max(alpha, score);
+                if (beta <= alpha) state.Break();
             };
 
-            Parallel.ForEach(node.Children, scoreNodes);
+            Parallel.ForEach(node.Children, processChildren);
 
-            Node bestNode = children.Max();
-            node.Score = bestNode.Score;
-
-            return bestNode;
+            node.Score = best.Score;
+            return best;
         }
-        public static Node ParallelAlphaBetaMin(Node node)
-        {
-            if (node.IsTerminal) return node;
 
-            var children = new ConcurrentBag<Node>();
-            Action<Node> scoreNodes = child =>
+        public static Node ParallelAlphaBetaMin(Node node, double alpha = double.NegativeInfinity, double beta = double.PositiveInfinity)
+        {
+            Node best = Node.MaximalNode;
+            object lockObject = new object();
+            double score = best.Score;
+
+            Action<Node, ParallelLoopState> processChildren = (child, state) =>
             {
-                AlphaBetaMax(child);
-                children.Add(child);
+                AlphaBetaMax(child, alpha, beta);
+                lock (lockObject)
+                {
+                    if (child.Score < score)
+                    {
+                        best = child;
+                        score = best.Score;
+                    }
+                }
+
+                beta = Math.Min(beta, score);
+                if (beta <= alpha) state.Break();
             };
 
-            Parallel.ForEach(node.Children, scoreNodes);
+            Parallel.ForEach(node.Children, processChildren);
 
-            Node bestNode = children.Min();
-            node.Score = bestNode.Score;
-
-            return bestNode;
+            node.Score = best.Score;
+            return best;
         }
 
     }
