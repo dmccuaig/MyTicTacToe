@@ -68,18 +68,13 @@ namespace TicTacToe.Engine
 
             _rowCounts = new int[_order];
             _colCounts = new int[_order];
-            for (int i = 0; i < _order; i++)
-            {
-                _rowCounts[i] = parent._rowCounts[i];
-                _colCounts[i] = parent._colCounts[i];
-            }
+            Array.Copy(parent._rowCounts, _rowCounts, _order);
+            Array.Copy(parent._colCounts, _colCounts, _order);
             _diagCounts = parent._diagCounts;
             _backDiagCounts = parent._backDiagCounts;
 
             TriBoard = new int[_order, _order];
-            for (int i = 0; i < _order; i++)
-                for (int j = 0; j < _order; j++)
-                    TriBoard[i, j] = parent.TriBoard[i, j];
+            Array.Copy(parent.TriBoard, TriBoard, _order * _order);
             TriBoard[row, col] = _player;
 
             _playedCells = parent._playedCells + 1;

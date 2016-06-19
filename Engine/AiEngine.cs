@@ -22,6 +22,7 @@ namespace TicTacToe.Engine
             //    : (TicTacToeNode) Search.ParallelAlphaBeta(node);
             //TicTacToeNode bestMove = (TicTacToeNode)Search.AlphaBeta(node);
             TicTacToeNode bestMove = (TicTacToeNode)Search.ParallelAlphaBeta(node);
+           // Environment.Exit(0);
             return bestMove.TriBoard;
         }
 
