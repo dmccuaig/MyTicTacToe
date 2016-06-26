@@ -17,12 +17,7 @@ namespace TicTacToe.Engine
         public int[,] GetBestMove(int[,] triBoard)
         {
             Node node = new TicTacToeNode(Move.Opponent, triBoard);
-            //TicTacToeNode bestMove = triBoard.GetOrder() <= 3
-            //    ? (TicTacToeNode) Search.AlphaBeta(node)
-            //    : (TicTacToeNode) Search.ParallelAlphaBeta(node);
-            //TicTacToeNode bestMove = (TicTacToeNode)Search.AlphaBeta(node);
-            TicTacToeNode bestMove = (TicTacToeNode)Search.ParallelAlphaBeta(node);
-           // Environment.Exit(0);
+            var bestMove = (TicTacToeNode)Search.AlphaBeta(node);
             return bestMove.TriBoard;
         }
 

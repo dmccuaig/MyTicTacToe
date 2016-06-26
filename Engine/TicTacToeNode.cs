@@ -8,7 +8,7 @@ namespace TicTacToe.Engine
 {
     public class TicTacToeNode : Node
     {
-        private const double WinValue = 1000;
+        private const double WinValue = 10000;
 
         private readonly int _order;
         private readonly int _rootPlayer;
@@ -25,6 +25,11 @@ namespace TicTacToe.Engine
         public int[,] TriBoard { get; }
 
         public override bool IsTerminal => _isTerminal;
+
+        public override void SetScoreFromChild(Node child)
+        {
+            Score += child.Score;
+        }
 
         public override IEnumerable<Node> Children
         {
@@ -234,20 +239,19 @@ namespace TicTacToe.Engine
             }
         }
 
-        //private void ToDebug()
-        //{
-        //    Debug.WriteLine("");
-        //    Debug.WriteLine(this);
-        //    Debug.WriteLine("IsTerminal="+_isTerminal);
-        //    Debug.WriteLine("DiagCount="+_diagCounts+" BackDiagCounts="+_backDiagCounts);
-        //    Debug.Write("RowCounts=");
-        //    for(int i = 0; i < _order; i++) Debug.Write(_rowCounts[i]+",");
-        //    Debug.WriteLine("");
-        //    Debug.Write("ColCounts=");
-        //    for (int i = 0; i < _order; i++) Debug.Write(_colCounts[i] + ",");
-        //    Debug.WriteLine("");
-
-        //}
+        private void ToDebug()
+        {
+            System.Diagnostics.Debug.WriteLine("");
+            System.Diagnostics.Debug.WriteLine(this);
+            System.Diagnostics.Debug.WriteLine("IsTerminal=" + _isTerminal);
+            System.Diagnostics.Debug.WriteLine("DiagCount=" + _diagCounts + " BackDiagCounts=" + _backDiagCounts);
+            System.Diagnostics.Debug.Write("RowCounts=");
+            for (int i = 0; i < _order; i++) System.Diagnostics.Debug.Write(_rowCounts[i] + ",");
+            System.Diagnostics.Debug.WriteLine("");
+            System.Diagnostics.Debug.Write("ColCounts=");
+            for (int i = 0; i < _order; i++) System.Diagnostics.Debug.Write(_colCounts[i] + ",");
+            System.Diagnostics.Debug.WriteLine("");
+        }
 
     }
 }

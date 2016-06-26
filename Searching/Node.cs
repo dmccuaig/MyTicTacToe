@@ -9,9 +9,11 @@ namespace TicTacToe.Tree
         public static Node MinimalNode = new ExtremeScoreNode(double.NegativeInfinity);
         public static Node MaximalNode = new ExtremeScoreNode(double.PositiveInfinity);
 
-        public double Score { get; set; }
+        public double Score { get; protected set; }
         public abstract IEnumerable<Node> Children { get; }
         public abstract bool IsTerminal { get; }
+
+        public abstract void SetScoreFromChild(Node child);
 
         public int CompareTo(Node other)
         {
@@ -32,6 +34,8 @@ namespace TicTacToe.Tree
 
             public override IEnumerable<Node> Children => Enumerable.Empty<Node>();
             public override bool IsTerminal => true;
+
+            public override void SetScoreFromChild(Node child) { }
         }
 
     }

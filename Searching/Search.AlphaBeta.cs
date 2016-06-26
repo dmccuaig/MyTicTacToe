@@ -29,7 +29,7 @@ namespace TicTacToe.Tree
                 if (beta <= alpha) break;
             }
 
-            node.Score = best.Score;
+            node.SetScoreFromChild(best);
             return best;
         }
 
@@ -49,7 +49,7 @@ namespace TicTacToe.Tree
                 if (beta <= alpha) break;
             }
 
-            node.Score = best.Score;
+            node.SetScoreFromChild(best);
             return best;
         }
 

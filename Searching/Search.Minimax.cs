@@ -24,7 +24,7 @@
                     best = child;
             }
 
-            node.Score = best.Score;
+            node.SetScoreFromChild(best);
             return best;
         }
 
@@ -41,7 +41,7 @@
                     best = child;
             }
 
-            node.Score = best.Score;
+            node.SetScoreFromChild(best);
             return best;
         }
 
